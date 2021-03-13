@@ -1,0 +1,23 @@
+function transformobjecttostring(activefilters) {
+   var newstring =   ;
+ 
+   var checkfiltergroups = function(filtertopic) {
+     activefilters[filtertopic].map(function(selectedfilter) {
+       var tempstring = filtertopic +  ~~  + selectedfilter +  | ;
+       console.log( check string   tempstring);
+       newstring.concat(tempstring);
+     });
+   }
+ 
+   for (var filtergroup in activefilters) {
+     checkfiltergroups(filtergroup);
+   }
+ 
+   return newstring;
+ 
+ }
+ 
+ console.log(transformobjecttostring(testobject));</code></pre>
+ </div>
+ </div>
+     
