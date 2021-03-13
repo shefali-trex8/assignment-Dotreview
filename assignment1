@@ -1,0 +1,347 @@
+<div class= snippet-code >
+ <pre class= snippet-code-js lang-js prettyprint-override ><code>// scripts
+ 
+ // store element in dom
+ const searchbutton = document.getelementbyid( submit-button );
+ 
+ // add event listener to button
+ searchbutton.addeventlistener( click   searchfornews);
+ 
+ // function to search for news
+ function searchfornews(e) {
+ 
+  e.preventdefault();
+ 
+     // store element in dom
+     const searchform = document.getelementbyid( search-form );
+ 
+     // retrieve the value in the input field
+     const searchterm = searchform.value;
+ 
+     // log to console
+     console.log( you searched for   + searchterm);
+ 
+     // token
+     const token = xxxxxxxx;
+ 
+     const urlarray = new array;
+ 
+     // create the urls to search for the news
+     const guardianurl =  http://webhose.io/filterwebcontent token=  + token +  &amp;format=json&amp;sort=crawled&amp;q=  + searchterm +  %20site_type%3anews%20site%3atheguardian.com%20language%3aenglish%20performance_score%3a%3e5 ;
+     const bbcurl =  http://webhose.io/filterwebcontent token=  + token +  &amp;format=json&amp;sort=crawled&amp;q=  + searchterm +  %20site_type%3anews%20site%3abbc.co.uk%20language%3aenglish%20performance_score%3a%3e5 ;
+     const telegraphurl =  http://webhose.io/filterwebcontent token=  + token +  &amp;format=json&amp;sort=crawled&amp;q=  + searchterm +  %20site_type%3anews%20site%3atelegraph.co.uk%20language%3aenglish%20performance_score%3a%3e5 ;
+ 
+     // push each url in to the array
+     urlarray.push(guardianurl);
+     urlarray.push(bbcurl);
+     urlarray.push(telegraphurl);
+ 
+     console.log(urlarray[0])
+ 
+     // declare element
+     const headerwrapper = document.getelementbyid( header-wrapper );
+ 
+     // add class to headerwrapper
+     headerwrapper.classlist.add( header-small );
+ 
+     // templates for news sources
+     guardiantemplate =  &lt;div id= theguardian data-source= theguardian.com  class= news-wrapper &gt;&lt;div class= source-name &gt;&lt;p&gt;the guardian&lt;/p&gt;&lt;/div&gt;&lt;/div&gt; ;
+     bbctemplate =  &lt;div id= bbc data-source= bbc.co.uk  class= news-wrapper &gt;&lt;div class= source-name &gt;&lt;p&gt;bbc news&lt;/p&gt;&lt;/div&gt;&lt;/div&gt; ;
+     telegraphtemplate =  &lt;div id= telegraph  data-source= telegraph.co.uk  class= news-wrapper &gt;&lt;div class= source-name &gt;&lt;p&gt;the telegraph&lt;/p&gt;&lt;/div&gt;&lt;/div&gt; ;
+ 
+     var articlewrapper = document.getelementbyid( article-wrapper );
+ 
+     articlewrapper.innerhtml =   ;
+ 
+     const searchedtemplate =  &lt;div class= searched-for &gt;&lt;h1&gt;you searched for    + searchterm +   &lt;/h1&gt;&lt;/div&gt; ;
+ 
+     // insert template in to header wrapper element 
+     headerwrapper.innerhtml += searchedtemplate;
+ 
+     // insert templates in to element
+     articlewrapper.innerhtml += guardiantemplate;
+     articlewrapper.innerhtml += bbctemplate;
+     articlewrapper.innerhtml += telegraphtemplate;
+ 
+     // for loop to go through the url array
+     for (let i = 0; i &lt; urlarray.length; i++) {
+ 
+         // declare a new request
+         const newsreq = new xmlhttprequest();
+ 
+         // open the request
+         newsreq.open( get   urlarray[i]  true);
+ 
+         // function to run when loading
+         newsreq.onload = function() {
+ 
+             // if the status is between 200 and 399
+             if (this.status &gt;= 200 &amp;&amp; this.status &lt; 400) {
+ 
+                 // request is successful
+                 // parse the response
+                 const res = json.parse(this.response);
+ 
+                 // enter the posts object
+                 const posts = res.posts;
+ 
+                 // for look to go through the response
+                 for (let i = 0; i &lt; posts.length; i++) {
+ 
+                     // get the name of the site
+                     const source = posts[i].thread.site;
+ 
+                     // get image
+                     const image = posts[i].thread.main_image;
+ 
+                     // get the title post
+                     var title = posts[i].title;
+ 
+                     // split using the | symbol  take the first string in array
+                     var title = title.split( | )[0];
+ 
+                     // take the string and replace  = bbc news  with nothing
+                     var title = title.replace( - bbc news     );
+ 
+                     // trim excess spaces around string
+                     var title = title.trim();
+ 
+                     const articleurl = posts[i].thread.url
+ 
+                     // log to console
+                     console.log(title +   |   + source +   |   + articleurl);
+ 
+                     var template =  &lt;a class= link  href=   + articleurl +   &gt;&lt;div class= article &gt;  + 
+                       &lt;img class= image  src=   + image +   &gt;  + 
+                       &lt;div class= title &gt;  + title +  &lt;/div&gt;  +
+                       &lt;/div&gt;&lt;/a&gt; ;
+ 
+                     // declare element
+                     var newswrapper = document.queryselectorall( .news-wrapper );
+ 
+                     // look through the newswrapper element to find elements that match source names
+                     var currentwrapper = [...newswrapper].find((wrapper) =&gt; wrapper.dataset.source === source);
+ 
+                     // create fragment
+                     var articlefragment = document.createrange().createcontextualfragment(template);
+ 
+                     // add the fragment to the correct wrapper
+                     currentwrapper.appendchild(articlefragment);
+                 }
+ 
+             } else {
+                 // we reached our target server  but it returned an error
+ 
+             }
+         };
+ 
+         newsreq.onerror = function() {
+             // there was a connection error of some sort
+         };
+ 
+         newsreq.send();
+     }
+ }</code></pre>
+ <pre class= snippet-code-css lang-css prettyprint-override ><code>/* stylesheet */
+ 
+ 
+ body {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 18px;
+  color: #242424;
+ }
+ 
+ input {
+  font-family:  graphik ;
+ }
+ 
+ * {
+  box-sizing: border-box;
+  font-family:  graphik ;
+ }
+ 
+ .header-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  transition: height 0.5s ease;
+ }
+ 
+ .header-small {
+  height: 300px;
+ }
+ 
+ .logo-wrapper {
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 25px;
+ }
+ 
+ .logo {
+  max-width: 100%;
+ }
+ 
+ .search-wrapper {
+  width: 100%;
+  max-width: 500px;
+ }
+ 
+ .form-wrapper {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+ }
+ 
+ .search-form {
+  width: 100%;
+  text-align: center;
+  padding: 10px;
+  border-radius: 50px 0 0 50px;
+  outline: none;
+  border: 1px solid lightgrey;
+  border-right: none;
+ }
+ 
+ .submit-button {
+  border-radius: 0 50px 50px 0;
+  border: 1px solid lightgrey;
+  border-left: none;
+  background-color: #fff;
+  padding: 10px;
+  width: 45px;
+  height: 43px;
+  background-image: url(/assets/images/search.svg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 20px;
+  transition: 0.25s ease;
+ }
+ 
+ .submit-button:hover {
+  cursor: pointer;
+  background-size: 25px;
+ }
+ 
+ .article-wrapper {
+  display: flex;
+  flex-direction: row;
+ }
+ 
+ .news-wrapper {
+  width: 33.33%;
+  margin-left: 20px;
+  margin-right: 20px;
+ }
+ 
+ .source-name {
+  width: 100%;
+  text-align: center;
+ }
+ 
+ .image {
+  max-width: 100%;
+ }
+ 
+ .article {
+  margin-bottom: 20px;
+ }
+ 
+ .title {
+  padding: 10px;
+ }
+ 
+ .link {
+  text-decoration: none;
+  color: #242424;
+ }
+ 
+ @media screen and (max-width: 512px) {
+ 
+  .header-wrapper {
+   padding: 40px;
+  }
+ 
+  .article-wrapper {
+   flex-direction: column;
+  }
+ 
+  .news-wrapper {
+   width: 100%;
+  }
+ 
+ }</code></pre>
+ <pre class= snippet-code-html lang-html prettyprint-override ><code>&lt;!doctype html&gt;
+ &lt;html lang= en &gt;
+ 
+  &lt;head&gt;
+ 
+   &lt;!-- character encoding --&gt;
+   &lt;meta charset= utf-8 &gt;
+ 
+   &lt;!-- viewport --&gt;
+   &lt;meta name= viewport  content= width=device-width initial-scale=1 &gt;
+ 
+   &lt;!-- optional
+ 
+   &lt;meta name= author  content= name &gt;
+    &lt;meta name= description  content= description here &gt;
+     &lt;meta name= keywords  content= keywords here &gt;
+ 
+   --&gt;
+ 
+   &lt;!-- title of page --&gt;
+   &lt;title&gt;broadbulletin&lt;/title&gt;
+ 
+   &lt;link rel= stylesheet  href= css/style.css  type= text/css &gt;
+   &lt;link rel= stylesheet  href= css/normalize.css  type= text/css &gt;
+      
+      &lt;!-- web fonts --&gt;
+       &lt;!-- &lt;link rel= stylesheet  href= css/fonts.css  type= text/css &gt; --&gt;
+ 
+  &lt;/head&gt;
+ 
+  &lt;body&gt;
+ 
+   &lt;div id= header-wrapper  class= header-wrapper &gt;
+ 
+    &lt;div class= logo-wrapper &gt;
+ 
+     &lt;img class= logo  src= assets/images/logo.png  alt= logo &gt;
+ 
+    &lt;/div&gt;
+ 
+    &lt;div class= search-wrapper &gt;
+ 
+    &lt;div class= form-wrapper &gt;
+     
+     &lt;form class= form-wrapper &gt;
+ 
+      &lt;input id= search-form  class= search-form  type= text  placeholder= what s in the news today  &gt;
+      &lt;input id= submit-button  class= submit-button  type= submit  value=  &gt;
+ 
+     &lt;/form&gt;
+ 
+    &lt;/div&gt;
+ 
+   &lt;/div&gt;
+ 
+   &lt;/div&gt;
+ 
+   &lt;div class= article-wrapper  id= article-wrapper &gt;
+ 
+   
+    
+ 
+ 
+   &lt;/div&gt;
+ 
+   
+ 
+ 
+ 
